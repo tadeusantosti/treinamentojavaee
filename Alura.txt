@@ -1,0 +1,14 @@
+EJB: O poder do Java EE - OK
+
+ Curso Java e JPA: Persista seus objetos com a JPA2 e Hibernate
+Introdução à JPA e Hibernate - OK
+Configuração e Inicialização da JPA - OK
+Gerenciamento de estados pelo EntityManager - - -
+Mapeamento de relacionamentos entre entidades
+Muitos para muitos e um para um
+Pesquisas orientadas a objeto com JPQL
+Trabalhando com Lazy e relacionamentos bidirecionais
+Um pouco mais sobre queries e JPQL
+Organizando nossas queries
+
+
