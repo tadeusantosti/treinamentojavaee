@@ -31,7 +31,7 @@ public class WebServiceGestaoContas {
         gestaoContaBean.atualizarLancamento(atualizarLancamentoRequisicao);
         return Response.Status.OK.getReasonPhrase();
     }
-    
+
     @WebMethod(operationName = "pesquisarPorTipoLancamento")
     @WebResult(name = "Lancamento")
     public List<Lancamento> pesquisarPorTipoLancamento(@WebParam(name = "tipoLancamento") int idtipolancamento) throws Exception {
