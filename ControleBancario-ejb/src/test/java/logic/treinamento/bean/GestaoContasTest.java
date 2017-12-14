@@ -242,10 +242,10 @@ public class GestaoContasTest extends TestCase {
         novaData.add(Calendar.DAY_OF_MONTH, 2);
 
         AtualizarLancamentoRequisicao atualizarLancamentoRequisicao = new AtualizarLancamentoRequisicao();
-        atualizarLancamentoRequisicao.setNome("Charles Darwin");
-        atualizarLancamentoRequisicao.setValor(new BigDecimal(9999.99));
-        atualizarLancamentoRequisicao.setData(Formatadores.formatoDataInterface.format(novaData.getTime()));
-        atualizarLancamentoRequisicao.setIdTipoLancamento(TipoLancamentoEnum.TRANSFERENCIA.getId());
+        atualizarLancamentoRequisicao.setNomeAtualizado("Charles Darwin");
+        atualizarLancamentoRequisicao.setValorAtualizado(new BigDecimal(9999.99));
+        atualizarLancamentoRequisicao.setDataAtualizada(Formatadores.formatoDataInterface.format(novaData.getTime()));
+        atualizarLancamentoRequisicao.setIdTipoLancamentoAtualizado(TipoLancamentoEnum.TRANSFERENCIA.getId());
         atualizarLancamentoRequisicao.setId(0);
         gestaoContaBean.atualizarLancamento(atualizarLancamentoRequisicao);
 
@@ -253,10 +253,10 @@ public class GestaoContasTest extends TestCase {
 
         if (!lancamentoAtualizado.isEmpty()) {
             for (Lancamento lancAtualizado : lancamentoAtualizado) {
-                assertEquals(atualizarLancamentoRequisicao.getNome(), lancAtualizado.getNome());
-                assertEquals(atualizarLancamentoRequisicao.getValor().doubleValue(), lancAtualizado.getValor().doubleValue());
-                assertEquals(atualizarLancamentoRequisicao.getData(), Formatadores.formatoDataInterface.format(lancAtualizado.getData()));
-                assertEquals(atualizarLancamentoRequisicao.getIdTipoLancamento(), lancAtualizado.getIdTipoLancamento());
+                assertEquals(atualizarLancamentoRequisicao.getNomeAtualizado(), lancAtualizado.getNome());
+                assertEquals(atualizarLancamentoRequisicao.getValorAtualizado().doubleValue(), lancAtualizado.getValor().doubleValue());
+                assertEquals(atualizarLancamentoRequisicao.getDataAtualizada(), Formatadores.formatoDataInterface.format(lancAtualizado.getData()));
+                assertEquals(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado(), lancAtualizado.getIdTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi atualizado!");

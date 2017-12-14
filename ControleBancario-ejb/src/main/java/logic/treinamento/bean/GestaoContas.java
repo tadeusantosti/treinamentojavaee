@@ -40,10 +40,10 @@ public class GestaoContas implements InterfaceGestaoContas {
     public void atualizarLancamento(AtualizarLancamentoRequisicao atualizarLancamentoRequisicao) throws Exception {
         Lancamento lanc = new Lancamento();
         lanc.setId(atualizarLancamentoRequisicao.getId());
-        lanc.setNome(atualizarLancamentoRequisicao.getNome());
-        lanc.setValor(atualizarLancamentoRequisicao.getValor());
-        lanc.setIdTipoLancamento(atualizarLancamentoRequisicao.getIdTipoLancamento());
-        lanc.setData(Formatadores.validarDatasInformadas(atualizarLancamentoRequisicao.getData()).get(0));
+        lanc.setNome(atualizarLancamentoRequisicao.getNomeAtualizado());
+        lanc.setValor(atualizarLancamentoRequisicao.getValorAtualizado());
+        lanc.setIdTipoLancamento(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado());
+        lanc.setData(Formatadores.validarDatasInformadas(atualizarLancamentoRequisicao.getDataAtualizada()).get(0));
         
         String retornoValidacao = validarCamposObrigatoriosAtualizacao(lanc);
 

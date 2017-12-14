@@ -2,18 +2,26 @@ package logic.treinamento.request;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name = "LancarContasDoMesRequisicao")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class LancarContasDoMesRequisicao implements Serializable {
 
     
-    @XmlAttribute(required = true)
+    @XmlElement
     private String nome;
-    @XmlAttribute(required = true)
+    
+    @XmlElement
     private BigDecimal valor;
-    @XmlAttribute(required = true)
+    
+    @XmlElement
     private int idTipoLancamento;
-    @XmlAttribute(required = true)
+    
+    @XmlElement
     private String data;
 
     public String getNome() {
