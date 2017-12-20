@@ -5,8 +5,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.sql.Date;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import logic.treinamento.dao.InterfaceLancamentoDao;
 import logic.treinamento.model.Lancamento;
 import logic.treinamento.dao.TipoLancamentoEnum;
@@ -20,46 +24,64 @@ public class GestaoContas implements InterfaceGestaoContas {
     @EJB
     private InterfaceLancamentoDao lancamentoDao;
 
+    @Resource
+    private SessionContext context;
+
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void lancarContasDoMes(LancarContasDoMesRequisicao lancarContasDoMesRequisicao) throws Exception {
+        try {
 
-        Lancamento lanc = new Lancamento();
-        lanc.setNome(lancarContasDoMesRequisicao.getNome());
-        lanc.setValor(lancarContasDoMesRequisicao.getValor());
-        lanc.setIdTipoLancamento(lancarContasDoMesRequisicao.getIdTipoLancamento());
-        lanc.setData(Formatadores.validarDatasInformadas(lancarContasDoMesRequisicao.getData()).get(0));
-        
-        String retornoValidacao = validarCamposObrigatorios(lanc);
+            Lancamento lanc = new Lancamento();
+            lanc.setNome(lancarContasDoMesRequisicao.getNome());
+            lanc.setValor(lancarContasDoMesRequisicao.getValor());
+            lanc.setIdTipoLancamento(lancarContasDoMesRequisicao.getIdTipoLancamento());
+            lanc.setData(Formatadores.validarDatasInformadas(lancarContasDoMesRequisicao.getData()).get(0));
 
-        if (retornoValidacao.isEmpty()) {
-            lancamentoDao.salvarContasDoMes(lanc);            
+            String retornoValidacao = validarCamposObrigatorios(lanc);
+
+            if (retornoValidacao.isEmpty()) {
+                lancamentoDao.salvarContasDoMes(lanc);
+            }
+        } catch (Exception e) {
+            context.setRollbackOnly();
         }
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void atualizarLancamento(AtualizarLancamentoRequisicao atualizarLancamentoRequisicao) throws Exception {
-        Lancamento lanc = new Lancamento();
-        lanc.setId(atualizarLancamentoRequisicao.getId());
-        lanc.setNome(atualizarLancamentoRequisicao.getNomeAtualizado());
-        lanc.setValor(atualizarLancamentoRequisicao.getValorAtualizado());
-        lanc.setIdTipoLancamento(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado());
-        lanc.setData(Formatadores.validarDatasInformadas(atualizarLancamentoRequisicao.getDataAtualizada()).get(0));
-        
-        String retornoValidacao = validarCamposObrigatoriosAtualizacao(lanc);
+        try {
+            Lancamento lanc = new Lancamento();
+            lanc.setId(atualizarLancamentoRequisicao.getId());
+            lanc.setNome(atualizarLancamentoRequisicao.getNomeAtualizado());
+            lanc.setValor(atualizarLancamentoRequisicao.getValorAtualizado());
+            lanc.setIdTipoLancamento(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado());
+            lanc.setData(Formatadores.validarDatasInformadas(atualizarLancamentoRequisicao.getDataAtualizada()).get(0));
 
-        if (retornoValidacao.equals("")) {
-            lancamentoDao.atualizarLancamento(lanc);         
+            String retornoValidacao = validarCamposObrigatoriosAtualizacao(lanc);
+
+            if (retornoValidacao.equals("")) {
+                lancamentoDao.atualizarLancamento(lanc);
+            }
+        } catch (Exception e) {
+            context.setRollbackOnly();
         }
 
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void excluirLancamento(int idLancamento) throws SQLException {
-        if (idLancamento >= 0) {
-            lancamentoDao.excluirLancamento(idLancamento);
-            System.out.println("Lancamento Excluido com Sucesso!");
-        } else {
-            System.out.println("E necessario informar o codigo do lancamento!");
+        try {
+            if (idLancamento >= 0) {
+                lancamentoDao.excluirLancamento(idLancamento);
+                System.out.println("Lancamento Excluido com Sucesso!");
+            } else {
+                System.out.println("E necessario informar o codigo do lancamento!");
+            }
+        } catch (SQLException e) {
+            context.setRollbackOnly();
         }
     }
 
@@ -122,16 +144,6 @@ public class GestaoContas implements InterfaceGestaoContas {
             return "";
         }
 
-    }
-
-    private boolean validarDatasInformadas(Date dataInicial, Date dataFinal) throws ParseException {
-        if (dataInicial != null || dataFinal != null) {
-            return false;
-        } else if (false) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
     private boolean validarTipoLancamentoInformado(int idtipolancamento) {

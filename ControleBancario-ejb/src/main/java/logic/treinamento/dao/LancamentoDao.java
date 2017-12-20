@@ -109,6 +109,8 @@ public class LancamentoDao implements InterfaceLancamentoDao {
                 lanc.setValor(rs.getBigDecimal("valor"));
                 lanc.setIdTipoLancamento(rs.getInt("idtipolancamento"));
                 listaLancamentos.add(lanc);
+                
+                //Formatadores.formatoDataInterface.format(lancamentoConsultado.getData())
             }
 
             return listaLancamentos;
