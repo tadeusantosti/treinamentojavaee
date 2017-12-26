@@ -11,7 +11,8 @@ public class Formatadores {
 
     public static final DateFormat formatoDataBanco = new SimpleDateFormat("yyyy-MM-dd");
     public static final DateFormat formatoDataInterface = new SimpleDateFormat("dd/MM/yyyy");
-
+    public static final SimpleDateFormat formatoExibicaoDataInterface = new SimpleDateFormat("dd/MM/yyyy");
+    
     public static List<Date> validarDatasInformadas(String... datas) throws Exception {
         List<Date> listaDatas = new ArrayList<>();
 
@@ -46,5 +47,8 @@ public class Formatadores {
         return listaDatas;
 
     }
-
+    
+    public static String formatarDataGui(Date data){
+         return formatoExibicaoDataInterface.format(data);
+    }
 }

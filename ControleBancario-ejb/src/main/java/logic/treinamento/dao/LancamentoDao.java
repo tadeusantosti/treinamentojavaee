@@ -1,5 +1,6 @@
 package logic.treinamento.dao;
 
+import java.math.RoundingMode;
 import logic.treinamento.model.Lancamento;
 import java.sql.Connection;
 import java.sql.Date;
@@ -104,13 +105,11 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             while (rs.next()) {
                 Lancamento lanc = new Lancamento();
                 lanc.setId(rs.getInt("id"));
-                lanc.setData(rs.getDate("data"));
+                lanc.setDataGUI(Formatadores.formatarDataGui(rs.getDate("data")));
                 lanc.setNome(rs.getString("nome"));
-                lanc.setValor(rs.getBigDecimal("valor"));
+                lanc.setValor(rs.getBigDecimal("valor").setScale(2, RoundingMode.HALF_UP));
                 lanc.setIdTipoLancamento(rs.getInt("idtipolancamento"));
                 listaLancamentos.add(lanc);
-                
-                //Formatadores.formatoDataInterface.format(lancamentoConsultado.getData())
             }
 
             return listaLancamentos;
@@ -141,9 +140,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             while (rs.next()) {
                 Lancamento lanc = new Lancamento();
                 lanc.setId(rs.getInt("id"));
-                lanc.setData(rs.getDate("data"));
+                lanc.setDataGUI(Formatadores.formatarDataGui(rs.getDate("data")));
                 lanc.setNome(rs.getString("nome"));
-                lanc.setValor(rs.getBigDecimal("valor"));
+                lanc.setValor(rs.getBigDecimal("valor").setScale(2, RoundingMode.HALF_UP));
                 lanc.setIdTipoLancamento(rs.getInt("idtipolancamento"));
                 listaLancamentos.add(lanc);
             }
@@ -177,9 +176,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             while (rs.next()) {
                 Lancamento lanc = new Lancamento();
                 lanc.setId(rs.getInt("id"));
-                lanc.setData(rs.getDate("data"));
+                lanc.setDataGUI(Formatadores.formatarDataGui(rs.getDate("data")));
                 lanc.setNome(rs.getString("nome"));
-                lanc.setValor(rs.getBigDecimal("valor"));
+                lanc.setValor(rs.getBigDecimal("valor").setScale(2, RoundingMode.HALF_UP));
                 lanc.setIdTipoLancamento(rs.getInt("idtipolancamento"));
                 listaLancamentos.add(lanc);
             }

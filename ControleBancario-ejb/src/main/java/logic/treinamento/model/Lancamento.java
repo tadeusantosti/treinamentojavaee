@@ -6,7 +6,8 @@ import java.sql.Date;
 public class Lancamento {
 
     private long id;
-    private String nome;
+    private String nome, dataGUI;
+    ;
     private Date data;
     private BigDecimal valor;
     private int idTipoLancamento;
@@ -51,4 +52,11 @@ public class Lancamento {
         this.data = data;
     }
 
+    public String getDataGUI() {
+        return dataGUI;
+    }
+
+    public void setDataGUI(String dataGUI) {
+        this.dataGUI = dataGUI;
+    }
 }
