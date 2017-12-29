@@ -13,11 +13,11 @@ public interface InterfaceLancamentoDao {
 
     public void atualizarLancamento(Lancamento lanc) throws SQLException;
 
-    public void excluirLancamento(int idLancamento) throws SQLException;
+    public void excluirLancamento(long idLancamento) throws SQLException;
 
     public List<Lancamento> pesquisarLancamentoPorPeriodo(Date dataInicial, Date dataFinal) throws SQLException;
 
     public List<Lancamento> pesquisarLancamentoPorNome(String nome) throws SQLException;
 
-    public List<Lancamento> pesquisarLancamentoPorTipoDeLancamento(int idtipolancamento) throws SQLException;
+    public List<Lancamento> pesquisarLancamentoPorTipoDeLancamento(TipoLancamentoEnum tipoLancamento) throws SQLException;
 }

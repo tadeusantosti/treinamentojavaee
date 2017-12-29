@@ -1,5 +1,6 @@
 package logic.treinamento.bean;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
@@ -11,16 +12,27 @@ import org.junit.runner.RunWith;
 import javax.ejb.EJB;
 import logic.treinamento.model.Lancamento;
 import logic.treinamento.dao.LancamentoDao;
-import logic.treinamento.dao.ManutencaoBancoDados;
 import logic.treinamento.dao.TipoLancamentoEnum;
 import logic.treinamento.request.AtualizarLancamentoRequisicao;
 import logic.treinamento.request.LancarContasDoMesRequisicao;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.StatelessBean;
+import org.junit.AfterClass;
 import utilitarios.Formatadores;
 
 @RunWith(ApplicationComposer.class)
 public class GestaoContasTest extends TestCase {
+
+    @AfterClass
+    public static void after() {
+        File folder = new File("C:\\banco");
+        if (folder.isDirectory()) {
+            File[] sun = folder.listFiles();
+            for (File toDelete : sun) {
+                toDelete.delete();
+            }
+        }
+    }
 
     @EJB
     private InterfaceGestaoContas gestaoContaBean;
@@ -128,7 +140,6 @@ public class GestaoContasTest extends TestCase {
      * Resultado Esperado: -Metodo validador retorna uma mensagem ao requisitor
      * de acordo com cada campo validado.
      *
-     * @throws Exception
      */
     @Test
     public void testValidarCamposObrigatorios() {
@@ -144,17 +155,12 @@ public class GestaoContasTest extends TestCase {
 
         lanc.setNome("Jair Rillo Junior");
         lanc.setValor(BigDecimal.valueOf(1200.05D));
-        lanc.setIdTipoLancamento(23);
-        assertEquals("E necessario informar um tipo de lancamento Valido !", gestaoContaBean.validarCamposObrigatorios(lanc));
-
-        lanc.setNome("Jair Rillo Junior");
-        lanc.setValor(BigDecimal.valueOf(1200.05D));
-        lanc.setIdTipoLancamento(TipoLancamentoEnum.DEPOSITO.getId());
+        lanc.setTipoLancamento(TipoLancamentoEnum.DEPOSITO);
         assertEquals("E necessario informar a data do lancamento !", gestaoContaBean.validarCamposObrigatorios(lanc));
 
         lanc.setNome("Jair Rillo Junior");
         lanc.setValor(BigDecimal.valueOf(1200.05D));
-        lanc.setIdTipoLancamento(TipoLancamentoEnum.DEPOSITO.getId());
+        lanc.setTipoLancamento(TipoLancamentoEnum.DEPOSITO);
         lanc.setData(new Date(new java.util.Date().getTime()));
         assertEquals("", gestaoContaBean.validarCamposObrigatorios(lanc));
 
@@ -175,8 +181,6 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testLancarContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -192,11 +196,13 @@ public class GestaoContasTest extends TestCase {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                 assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                assertEquals(TipoLancamentoEnum.getByCodigo(lancRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi salvo!");
         }
+
+        gestaoContaBean.excluirLancamento(3);
     }
 
     /**
@@ -214,8 +220,6 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testAtualizarDadosLancamento() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -231,7 +235,7 @@ public class GestaoContasTest extends TestCase {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                 assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                assertEquals(TipoLancamentoEnum.getByCodigo(lancRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi salvo!");
@@ -246,7 +250,7 @@ public class GestaoContasTest extends TestCase {
         atualizarLancamentoRequisicao.setValorAtualizado(new BigDecimal(9999.99));
         atualizarLancamentoRequisicao.setDataAtualizada(Formatadores.formatoDataInterface.format(novaData.getTime()));
         atualizarLancamentoRequisicao.setIdTipoLancamentoAtualizado(TipoLancamentoEnum.TRANSFERENCIA.getId());
-        atualizarLancamentoRequisicao.setId(0);
+        atualizarLancamentoRequisicao.setId(4);
         gestaoContaBean.atualizarLancamento(atualizarLancamentoRequisicao);
 
         List<Lancamento> lancamentoAtualizado = gestaoContaBean.pesquisarLancamentoPorNome("Charles");
@@ -256,11 +260,13 @@ public class GestaoContasTest extends TestCase {
                 assertEquals(atualizarLancamentoRequisicao.getNomeAtualizado(), lancAtualizado.getNome());
                 assertEquals(atualizarLancamentoRequisicao.getValorAtualizado().doubleValue(), lancAtualizado.getValor().doubleValue());
                 assertEquals(atualizarLancamentoRequisicao.getDataAtualizada(), Formatadores.formatoDataInterface.format(lancAtualizado.getData()));
-                assertEquals(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado(), lancAtualizado.getIdTipoLancamento());
+                assertEquals(TipoLancamentoEnum.getByCodigo(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado()), lancAtualizado.getTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi atualizado!");
         }
+
+        gestaoContaBean.excluirLancamento(4);
     }
 
     /**
@@ -275,8 +281,6 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testExcluirContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -292,13 +296,13 @@ public class GestaoContasTest extends TestCase {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                 assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                assertEquals(TipoLancamentoEnum.getByCodigo(lancRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi salvo!");
         }
 
-        gestaoContaBean.excluirLancamento(0);
+        gestaoContaBean.excluirLancamento(2);
 
         List<Lancamento> lancExcluido = gestaoContaBean.pesquisarLancamentoPorNome("Albert");
 
@@ -321,8 +325,6 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testPesquisarPorTipoDeLancamentoContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -338,11 +340,13 @@ public class GestaoContasTest extends TestCase {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                 assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                assertEquals(TipoLancamentoEnum.getByCodigo(lancRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
             }
         } else {
             fail("O lancamento bancario nao foi encontrado!");
         }
+
+        gestaoContaBean.excluirLancamento(1);
     }
 
     /**
@@ -359,8 +363,6 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testPesquisarPorPeriodoDeLancamentoContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -389,12 +391,12 @@ public class GestaoContasTest extends TestCase {
                     assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                     assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                     assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                    assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                    assertEquals(TipoLancamentoEnum.getByCodigo(lancRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
                 } else if (lancamentoConsultado.getNome().equals(lancDoisRequisicao.getNome())) {
                     assertEquals(lancDoisRequisicao.getNome(), lancamentoConsultado.getNome());
                     assertEquals(lancDoisRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
                     assertEquals(lancDoisRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
-                    assertEquals(lancDoisRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
+                    assertEquals(TipoLancamentoEnum.getByCodigo(lancDoisRequisicao.getIdTipoLancamento()), lancamentoConsultado.getTipoLancamento());
                 } else {
                     fail("O lancamento bancario nao foi encontrado!");
                 }
@@ -402,6 +404,9 @@ public class GestaoContasTest extends TestCase {
         } else {
             fail("O lancamento bancario nao foi encontrado!");
         }
+
+        gestaoContaBean.excluirLancamento(5);
+        gestaoContaBean.excluirLancamento(6);
     }
 
 }
