@@ -2,26 +2,15 @@ package logic.treinamento.model;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import logic.treinamento.dao.TipoLancamentoEnum;
 
-@Entity
 public class Lancamento {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nome, dataGUI;
+    ;
     private Date data;
     private BigDecimal valor;
-
-    @Enumerated(EnumType.STRING)
-    private TipoLancamentoEnum tipoLancamento;
+    private int idTipoLancamento;
 
     public String getNome() {
         return nome;
@@ -39,12 +28,12 @@ public class Lancamento {
         this.valor = valor;
     }
 
-    public TipoLancamentoEnum getTipoLancamento() {
-        return tipoLancamento;
+    public int getIdTipoLancamento() {
+        return idTipoLancamento;
     }
 
-    public void setTipoLancamento(TipoLancamentoEnum tipoLancamento) {
-        this.tipoLancamento = tipoLancamento;
+    public void setIdTipoLancamento(int idTipoLancamento) {
+        this.idTipoLancamento = idTipoLancamento;
     }
 
     public long getId() {

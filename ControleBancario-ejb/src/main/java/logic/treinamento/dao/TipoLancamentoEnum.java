@@ -14,16 +14,4 @@ public enum TipoLancamentoEnum {
     public int getId() {
         return id;
     }
-
-    public static TipoLancamentoEnum getByCodigo(int codigoID) {
-        if (codigoID <= 0) {
-            return null;
-        }
-        for (TipoLancamentoEnum tipoLanc : TipoLancamentoEnum.values()) {
-            if (tipoLanc.id == codigoID) {
-                return tipoLanc;
-            }
-        }
-        return null;
-    }
 }
