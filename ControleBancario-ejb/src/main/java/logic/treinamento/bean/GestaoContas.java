@@ -2,9 +2,10 @@ package logic.treinamento.bean;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.sql.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
@@ -12,6 +13,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import logic.treinamento.dao.InterfaceLancamentoDao;
+import logic.treinamento.dao.ManutencaoBancoDados;
 import logic.treinamento.model.Lancamento;
 import logic.treinamento.dao.TipoLancamentoEnum;
 import logic.treinamento.request.AtualizarLancamentoRequisicao;
@@ -76,9 +78,9 @@ public class GestaoContas implements InterfaceGestaoContas {
         try {
             if (idLancamento >= 0) {
                 lancamentoDao.excluirLancamento(idLancamento);
-                System.out.println("Lancamento Excluido com Sucesso!");
+                Logger.getLogger(GestaoContas.class.getName()).log(Level.SEVERE, null, "Lancamento Excluido com Sucesso!");                
             } else {
-                System.out.println("E necessario informar o codigo do lancamento!");
+                Logger.getLogger(GestaoContas.class.getName()).log(Level.SEVERE, null, "E necessario informar o codigo do lancamento!");                
             }
         } catch (SQLException e) {
             context.setRollbackOnly();

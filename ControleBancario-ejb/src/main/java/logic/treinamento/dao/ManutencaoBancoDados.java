@@ -2,18 +2,22 @@ package logic.treinamento.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.sql.DataSource;
 
 @Singleton
 @Startup
 public class ManutencaoBancoDados {
+
+    @Resource(mappedName = "java:/dbControleBancario")
+    private DataSource dataSource;
 
     @PostConstruct
     public void init() {
@@ -30,34 +34,33 @@ public class ManutencaoBancoDados {
         Connection con = null;
         PreparedStatement pstm = null;
         StringBuilder sql = null;
-        ResultSet rs = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
 
-            System.out.println("Criando tabela lancamento");
+            Logger.getLogger(ManutencaoBancoDados.class.getName()).log(Level.SEVERE, null, "Criando tabela lancamento");
             sql = new StringBuilder();
             sql.append("\n CREATE TABLE IF NOT EXISTS lancamento");
             sql.append("\n (id INTEGER IDENTITY PRIMARY KEY, nome VARCHAR(50), data TIMESTAMP, valor DOUBLE, idtipolancamento VARCHAR(50));");
             pstm = con.prepareStatement(sql.toString());
             pstm.execute();
 
-            System.out.println("Criando tabela tipolancamento");
+            Logger.getLogger(ManutencaoBancoDados.class.getName()).log(Level.SEVERE, null, "Criando tabela tipolancamento");
             sql.delete(0, sql.length());
             sql.append("\n CREATE TABLE IF NOT EXISTS tipolancamento");
             sql.append("\n (id INTEGER IDENTITY PRIMARY KEY, tipolancamento VARCHAR(50));");
             pstm = con.prepareStatement(sql.toString());
             pstm.execute();
 
-            System.out.println("Limpando tabela tipolancamento");
+            Logger.getLogger(ManutencaoBancoDados.class.getName()).log(Level.SEVERE, null, "Limpando tabela tipolancamento");
             sql.delete(0, sql.length());
             sql.append("\n DELETE FROM tipolancamento;");
             pstm = con.prepareStatement(sql.toString());
             pstm.execute();
 
         } finally {
-            conexao.fecharConexao(con, pstm, null, rs);
+            con.close();
+            pstm.close();
         }
     }
 
@@ -65,13 +68,11 @@ public class ManutencaoBancoDados {
         Connection con = null;
         Statement stm = null;
         StringBuilder sql = null;
-        ResultSet rs = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
 
-            System.out.println("Inserindo os tipos de lancamento");
+            Logger.getLogger(ManutencaoBancoDados.class.getName()).log(Level.SEVERE, null, "Inserindo os tipos de lancamento");
             sql = new StringBuilder();
             sql.append("\n INSERT INTO tipolancamento (id, tipolancamento) VALUES (1, 'TRANSFERENCIA');");
             sql.append("\n INSERT INTO tipolancamento (id, tipolancamento) VALUES (2, 'SAQUE');");
@@ -80,18 +81,18 @@ public class ManutencaoBancoDados {
             stm.execute(sql.toString());
 
         } finally {
-            conexao.fecharConexao(con, null, stm, rs);
+            con.close();
+            stm.close();
         }
     }
 
     private void removerDados() throws SQLException {
         Connection con = null;
         Statement stm = null;
-        StringBuilder sql = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
+        StringBuilder sql = null;        
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
 
             sql = new StringBuilder();
             sql.append("\n DROP TABLE IF EXISTS lancamento; ");
@@ -100,7 +101,8 @@ public class ManutencaoBancoDados {
             stm.execute(sql.toString());
 
         } finally {
-            conexao.fecharConexao(con, null, stm, null);
+            con.close();
+            stm.close();            
         }
     }
 }

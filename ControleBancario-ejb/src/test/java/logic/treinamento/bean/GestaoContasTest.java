@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Properties;
 import junit.framework.TestCase;
 import org.apache.openejb.junit.ApplicationComposer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.ejb.EJB;
+import logic.treinamento.dao.ConexaoBancoDados;
 import logic.treinamento.model.Lancamento;
 import logic.treinamento.dao.LancamentoDao;
 import logic.treinamento.dao.ManutencaoBancoDados;
@@ -17,6 +19,7 @@ import logic.treinamento.request.AtualizarLancamentoRequisicao;
 import logic.treinamento.request.LancarContasDoMesRequisicao;
 import org.apache.openejb.jee.EjbJar;
 import org.apache.openejb.jee.StatelessBean;
+import org.apache.openejb.testing.Configuration;
 import utilitarios.Formatadores;
 
 @RunWith(ApplicationComposer.class)
@@ -24,6 +27,8 @@ public class GestaoContasTest extends TestCase {
 
     @EJB
     private InterfaceGestaoContas gestaoContaBean;
+    @EJB
+    private ManutencaoBancoDados man;
 
     @org.apache.openejb.testing.Module
     public EjbJar beans() {
@@ -31,8 +36,22 @@ public class GestaoContasTest extends TestCase {
         ejbJar.addEnterpriseBean(new StatelessBean(GestaoContas.class));
         ejbJar.addEnterpriseBean(new StatelessBean(LancamentoDao.class));
         ejbJar.addEnterpriseBean(new StatelessBean(Formatadores.class));
+        ejbJar.addEnterpriseBean(new StatelessBean(ConexaoBancoDados.class));
+        ejbJar.addEnterpriseBean(new StatelessBean(ManutencaoBancoDados.class));
         return ejbJar;
 
+    }
+
+    @Configuration
+    public Properties config() throws Exception {
+        Properties p = new Properties();
+        p.put("dbControleBancario", "new://Resource?type=DataSource");
+        p.put("dbControleBancario.JdbcDriver", "org.hsqldb.jdbcDriver");
+        p.put("dbControleBancario.JdbcUrl", "jdbc:hsqldb:file:/" + System.getProperty("user.dir") + "/dbControleBancario");
+        p.put("dbControleBancario.UserName", "SA");
+        p.put("dbControleBancario.Password", "");
+
+        return p;
     }
 
     /**
@@ -175,8 +194,7 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testLancarContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
+        man.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -191,7 +209,7 @@ public class GestaoContasTest extends TestCase {
             for (Lancamento lancamentoConsultado : lancNovo) {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                assertEquals(lancRequisicao.getData().toString(), lancamentoConsultado.getDataGUI().toString());
                 assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
             }
         } else {
@@ -214,8 +232,7 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testAtualizarDadosLancamento() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
+        man.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -230,7 +247,7 @@ public class GestaoContasTest extends TestCase {
             for (Lancamento lancamentoConsultado : lancNovo) {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                assertEquals(lancRequisicao.getData(), lancamentoConsultado.getDataGUI());
                 assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
             }
         } else {
@@ -255,7 +272,7 @@ public class GestaoContasTest extends TestCase {
             for (Lancamento lancAtualizado : lancamentoAtualizado) {
                 assertEquals(atualizarLancamentoRequisicao.getNomeAtualizado(), lancAtualizado.getNome());
                 assertEquals(atualizarLancamentoRequisicao.getValorAtualizado().doubleValue(), lancAtualizado.getValor().doubleValue());
-                assertEquals(atualizarLancamentoRequisicao.getDataAtualizada(), Formatadores.formatoDataInterface.format(lancAtualizado.getData()));
+                assertEquals(atualizarLancamentoRequisicao.getDataAtualizada(), lancAtualizado.getDataGUI());
                 assertEquals(atualizarLancamentoRequisicao.getIdTipoLancamentoAtualizado(), lancAtualizado.getIdTipoLancamento());
             }
         } else {
@@ -275,8 +292,7 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testExcluirContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
+        man.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -291,7 +307,7 @@ public class GestaoContasTest extends TestCase {
             for (Lancamento lancamentoConsultado : lancNovo) {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                assertEquals(lancRequisicao.getData(), lancamentoConsultado.getDataGUI());
                 assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
             }
         } else {
@@ -321,8 +337,7 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testPesquisarPorTipoDeLancamentoContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
+        man.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -337,7 +352,7 @@ public class GestaoContasTest extends TestCase {
             for (Lancamento lancamentoConsultado : lancamentoDeSaque) {
                 assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                 assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                assertEquals(lancRequisicao.getData(), lancamentoConsultado.getDataGUI());
                 assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
             }
         } else {
@@ -359,8 +374,7 @@ public class GestaoContasTest extends TestCase {
      */
     @Test
     public void testPesquisarPorPeriodoDeLancamentoContasDoMes() throws Exception {
-        ManutencaoBancoDados m = new ManutencaoBancoDados();
-        m.init();
+        man.init();
 
         LancarContasDoMesRequisicao lancRequisicao = new LancarContasDoMesRequisicao();
         lancRequisicao.setNome("Albert Einstein");
@@ -388,12 +402,12 @@ public class GestaoContasTest extends TestCase {
                 if (lancamentoConsultado.getNome().equals(lancRequisicao.getNome())) {
                     assertEquals(lancRequisicao.getNome(), lancamentoConsultado.getNome());
                     assertEquals(lancRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                    assertEquals(lancRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                    assertEquals(lancRequisicao.getData(), lancamentoConsultado.getDataGUI());
                     assertEquals(lancRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
                 } else if (lancamentoConsultado.getNome().equals(lancDoisRequisicao.getNome())) {
                     assertEquals(lancDoisRequisicao.getNome(), lancamentoConsultado.getNome());
                     assertEquals(lancDoisRequisicao.getValor().doubleValue(), lancamentoConsultado.getValor().doubleValue());
-                    assertEquals(lancDoisRequisicao.getData(), Formatadores.formatoDataInterface.format(lancamentoConsultado.getData()));
+                    assertEquals(lancDoisRequisicao.getData(), lancamentoConsultado.getDataGUI());
                     assertEquals(lancDoisRequisicao.getIdTipoLancamento(), lancamentoConsultado.getIdTipoLancamento());
                 } else {
                     fail("O lancamento bancario nao foi encontrado!");

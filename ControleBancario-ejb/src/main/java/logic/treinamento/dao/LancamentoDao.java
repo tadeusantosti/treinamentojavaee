@@ -9,21 +9,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.sql.DataSource;
 import utilitarios.Formatadores;
 
 @Stateless
 public class LancamentoDao implements InterfaceLancamentoDao {
+
+    @Resource(mappedName = "java:/dbControleBancario")
+    private DataSource dataSource;
 
     @Override
     public void salvarContasDoMes(Lancamento lanc) throws SQLException {
         Connection con = null;
         PreparedStatement stm = null;
         StringBuilder sql = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n INSERT INTO lancamento (nome, data, valor, idtipolancamento)");
             sql.append("\n VALUES (?, ?, ?, ?)");
@@ -33,9 +37,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             stm.setBigDecimal(3, lanc.getValor());
             stm.setInt(4, lanc.getIdTipoLancamento());
             stm.execute();
-
-        } finally {
-            conexao.fecharConexao(con, null, stm, null);
+        } finally {            
+            con.close();
+            stm.close();
         }
     }
 
@@ -44,10 +48,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         Connection con = null;
         PreparedStatement pstm = null;
         StringBuilder sql = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n UPDATE lancamento SET ");
             sql.append("\n nome = '").append(lanc.getNome()).append("'");
@@ -59,7 +62,8 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             pstm.execute();
 
         } finally {
-            conexao.fecharConexao(con, pstm, null, null);
+            con.close();
+            pstm.close();
         }
     }
 
@@ -68,10 +72,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         Connection con = null;
         PreparedStatement pstm = null;
         StringBuilder sql = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n DELETE FROM lancamento WHERE id = ").append(idLancamento).append(";");
             pstm = con.prepareStatement(sql.toString());
@@ -80,7 +83,8 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         } catch (Exception ex) {
             throw new SQLException("erro ao excluir o lancamento " + ex.getMessage());
         } finally {
-            conexao.fecharConexao(con, pstm, null, null);
+            con.close();
+            pstm.close();
         }
     }
 
@@ -90,11 +94,10 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         PreparedStatement pstm = null;
         StringBuilder sql = null;
         ResultSet rs = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
         List<Lancamento> listaLancamentos = new ArrayList<>();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n SELECT lancamento.* FROM lancamento ");
             sql.append("\n JOIN tipolancamento ON tipolancamento.id = lancamento.idtipolancamento");
@@ -115,7 +118,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             return listaLancamentos;
 
         } finally {
-            conexao.fecharConexao(con, pstm, null, null);
+            con.close();
+            pstm.close();
+            rs.close();
         }
     }
 
@@ -125,11 +130,10 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         PreparedStatement pstm = null;
         StringBuilder sql = null;
         ResultSet rs = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
         List<Lancamento> listaLancamentos = new ArrayList<Lancamento>();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n SELECT lancamento.* FROM lancamento ");
             sql.append("\n JOIN tipolancamento ON tipolancamento.id = lancamento.idtipolancamento");
@@ -150,7 +154,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
             return listaLancamentos;
 
         } finally {
-            conexao.fecharConexao(con, pstm, null, null);
+            con.close();
+            pstm.close();
+            rs.close();
         }
     }
 
@@ -160,11 +166,10 @@ public class LancamentoDao implements InterfaceLancamentoDao {
         PreparedStatement pstm = null;
         StringBuilder sql = null;
         ResultSet rs = null;
-        ConexaoBancoDados conexao = new ConexaoBancoDados();
         List<Lancamento> listaLancamentos = new ArrayList<>();
 
         try {
-            con = conexao.conectaBanco();
+            con = dataSource.getConnection();
             sql = new StringBuilder();
             sql.append("\n SELECT lancamento.* FROM lancamento");
             sql.append("\n JOIN tipolancamento ON tipolancamento.id = lancamento.idtipolancamento");
@@ -185,7 +190,9 @@ public class LancamentoDao implements InterfaceLancamentoDao {
 
             return listaLancamentos;
         } finally {
-            conexao.fecharConexao(con, pstm, null, rs);
+            con.close();
+            pstm.close();
+            rs.close();
         }
     }
 }

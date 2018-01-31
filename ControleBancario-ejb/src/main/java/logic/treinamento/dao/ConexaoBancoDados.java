@@ -6,21 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConexaoBancoDados {
-
-    public Connection conectaBanco() throws SQLException {
-        String url = "jdbc:hsqldb:file:/" + System.getProperty("user.dir") + "/dbControleBancario";
-        System.out.println(url);
-        String user = "SA";
-        String password = "";
-        try {
-            Class.forName("org.hsqldb.jdbcDriver");
-        } catch (ClassNotFoundException ex) {
-            throw new SQLException(ex.getException());
-        }
-        return DriverManager.getConnection(url, user, password);
-    }
 
     public void fecharConexao(Connection con, PreparedStatement pstm, Statement stm, ResultSet rs) {
         try {
@@ -38,7 +27,8 @@ public class ConexaoBancoDados {
                 stm.close();
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
+            Logger.getLogger(ConexaoBancoDados.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
