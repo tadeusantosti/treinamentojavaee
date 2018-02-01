@@ -10,7 +10,6 @@ import org.apache.openejb.junit.ApplicationComposer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.ejb.EJB;
-import logic.treinamento.dao.ConexaoBancoDados;
 import logic.treinamento.model.Lancamento;
 import logic.treinamento.dao.LancamentoDao;
 import logic.treinamento.dao.ManutencaoBancoDados;
@@ -35,8 +34,7 @@ public class GestaoContasTest extends TestCase {
         EjbJar ejbJar = new EjbJar();
         ejbJar.addEnterpriseBean(new StatelessBean(GestaoContas.class));
         ejbJar.addEnterpriseBean(new StatelessBean(LancamentoDao.class));
-        ejbJar.addEnterpriseBean(new StatelessBean(Formatadores.class));
-        ejbJar.addEnterpriseBean(new StatelessBean(ConexaoBancoDados.class));
+        ejbJar.addEnterpriseBean(new StatelessBean(Formatadores.class));        
         ejbJar.addEnterpriseBean(new StatelessBean(ManutencaoBancoDados.class));
         return ejbJar;
 
